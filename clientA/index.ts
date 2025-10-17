@@ -53,9 +53,9 @@ app.listen(PORT, () => {
     // Enregistrement auprès du service X (Webhook)
     // CORRECTION: Changement de l'URL vers /api/hook et ajout de 'name'
     // Utiliser l'URL locale du Service X (ici il tourne sur localhost:3000)
-    const SERVICE_X_URL = 'http://10.112.132.186:3000/api/hook';
+    const SERVICE_X_URL = 'http://10.112.129.30:3000/api/hook';
     axios.post(SERVICE_X_URL, {
-        callback: `http://10.112.132.186:${PORT}/message`,
+        callback: `http://10.112.129.30:${PORT}/message`,
         name: "Client A" // AJOUTÉ
     })
         .then(() => console.log('Enregistré auprès du service X'))
