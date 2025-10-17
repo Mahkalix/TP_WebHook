@@ -8,11 +8,11 @@ function connectWs(ip: string) {
     console.log("Connecté au serveur WebSocket");
     setStatus("connected");
   });
-  socket.on("connect_error", (err) => {
+  socket.on("connect_error", (err: any) => {
     console.error("Erreur de connexion:", err);
     setStatus("connect_error");
   });
-  socket.on(CHANNEL, (msg) => displayMessage(msg));
+  socket.on(CHANNEL, (msg: string) => displayMessage(msg));
 }
 
 function displayMessage(message: string) {
