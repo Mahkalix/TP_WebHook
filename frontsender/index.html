@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📤 Message Sender</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>📤 Message Sender</h1>
+      
+      <div class="input-group">
+        <label for="ip">🌐 Adresse IP du serveur</label>
+        <input 
+          type="text" 
+          id="ip" 
+          placeholder="Ex: 192.168.1.100"
+        />
+      </div>
+      
+      <div class="input-group">
+        <label for="messageInput">💬 Votre message</label>
+        <input 
+          type="text" 
+          id="messageInput" 
+          placeholder="Tapez votre message..."
+        />
+      </div>
+      
+      <button id="sendBtn">
+        Envoyer le message
+      </button>
+      
+      <div class="status-container">
+        <div class="status-label">📊 Status</div>
+        <div id="status"></div>
+      </div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

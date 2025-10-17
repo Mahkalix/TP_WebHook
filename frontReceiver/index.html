@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lab</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="particles-bg">
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+    </div>
+
+    <main>
+      <div class="header">
+        <h1>WebSocket Lab</h1>
+      </div>
+
+      <div class="connection-panel">
+        <label for="ip">🌐 Server IP Address</label>
+        <div class="input-group">
+          <input id="ip" type="text" placeholder="192.168.1.10 or hostname" />
+          <button id="connectBtn">⚡ Connect</button>
+        </div>
+      </div>
+
+      <div class="status-panel">
+        <div class="status-dot"></div>
+        <span id="status">Status: Unknown</span>
+      </div>
+
+      <div class="messages-panel">
+        <div class="messages-header">📨 Incoming Messages</div>
+        <div id="messages"></div>
+      </div>
+
+      <div id="message"></div>
+
+      <div class="footer">
+        <span>Powered by Socket.IO • Built with 💜</span>
+      </div>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
