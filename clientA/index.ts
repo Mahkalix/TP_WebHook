@@ -2,6 +2,7 @@ import express from 'express';
 import { Server } from 'socket.io';
 import axios from 'axios';
 import { Request, Response } from 'express';
+import * as http from 'http';
 
 const app = express();
 app.use(express.json());
@@ -22,7 +23,7 @@ app.post('/message', (req: Request, res: Response) => {
     if (io) {
         // Émet sur le canal 'message' (CHANNEL dans frontReceiver) le JSON attendu
         io.emit('message', JSON.stringify({ say: message }));
-        console.log(`📢 Message WebHook reçu et transmis via Socket.IO sur port ${WS_PORT}`);
+        console.log(`📢 Message WebHook reçu et transmis via Socket.IO`);
     }
 
     res.status(200).send();
@@ -34,41 +35,53 @@ app.delete('/message', (req: Request, res: Response) => {
 });
 
 // Démarrage du serveur HTTP et de l'enregistrement du webhook
-app.listen(PORT, () => {
+const httpServer = app.listen(PORT, () => {
     console.log(`Client A HTTP listening on port ${PORT}`);
 
-    // Initialisation du serveur Socket.IO
-    const ioServer = new Server(WS_PORT, {
-        cors: {
-            origin: "*", // Nécessaire pour la connexion depuis le front
+    try {
+        // Initialisation du serveur Socket.IO
+        const ioServer = new Server(WS_PORT, {
+            cors: {
+                origin: "*", // Nécessaire pour la connexion depuis le front
+            }
+        });
+
+        io = ioServer; // Sauvegarde de l'instance pour l'utiliser dans app.post
+
+        ioServer.on('connection', (socket) => {
+            console.log(`Client Socket.IO ${socket.id} connecté sur port ${WS_PORT}`);
+
+            // Écouteur pour l'écho venant du front-end (frontReceiver)
+            socket.on('echo', (message: string) => {
+                console.log(`💬 Écho reçu du front-end ${socket.id}: ${message}`);
+                // Ré-émettre le message d'écho à tous les abonnés.
+                if (!message.startsWith('[ECHO')) { // Double vérification
+                    ioServer.emit('message', JSON.stringify({ say: `[ECHO du Client A] Réception confirmée: ${message}` }));
+                    console.log(`📢 Ré-émission de l'écho à tous les abonnés.`);
+                }
+            });
+
+            socket.on('disconnect', (reason) => {
+                console.log(`Client Socket.IO ${socket.id} déconnecté: ${reason}`);
+            });
+        });
+        console.log(`Client A Socket.IO listening on port ${WS_PORT}`);
+
+    } catch (e: any) {
+        if (e.code === 'EADDRINUSE') {
+            console.error(`❌ Erreur: Le port Socket.IO ${WS_PORT} est déjà utilisé. Arrêt.`);
+        } else {
+            console.error('❌ Erreur de démarrage Socket.IO:', e.message);
         }
-    });
-
-    io = ioServer; // Sauvegarde de l'instance pour l'utiliser dans app.post
-
-    ioServer.on('connection', (socket) => {
-        console.log(`Client Socket.IO ${socket.id} connecté sur port ${WS_PORT}`);
-
-        // NOUVEAU: Écouteur pour l'écho venant du front-end (frontReceiver)
-        socket.on('echo', (message: string) => {
-            console.log(`💬 Écho reçu du front-end ${socket.id}: ${message}`);
-            // Ré-émettre le message d'écho à tous les abonnés.
-            ioServer.emit('message', JSON.stringify({ say: `[ECHO du Client A] Réception confirmée: ${message}` }));
-            console.log(`📢 Ré-émission de l'écho à tous les abonnés.`);
-        });
-        // FIN NOUVEAU
-
-        socket.on('disconnect', (reason) => {
-            console.log(`Client Socket.IO ${socket.id} déconnecté: ${reason}`);
-        });
-    });
-    console.log(`Client A Socket.IO listening on port ${WS_PORT}`);
+        httpServer.close();
+        return;
+    }
 
     // Enregistrement auprès du service X (Webhook)
     const SERVICE_X_URL = 'http://10.112.132.186:3000/api/hook';
     axios.post(SERVICE_X_URL, {
         callback: `http://10.112.129.30:${PORT}/message`,
-        name: "Client A"
+        name: "Client A" // AJOUTÉ
     })
         .then(() => console.log('Enregistré auprès du service X'))
         .catch((err) => console.error('Erreur enregistrement Webhook:', err.message));
