@@ -1,50 +1,70 @@
 import { io, Socket } from "socket.io-client";
 
 const CHANNEL = "message";
-// ATTENTION: La connexion par défaut est au port 4000 (Client A). Modifiez-le pour 4001 si vous écoutez le Client B.
-const WS_PORT = 4000;
-let currentSocket: Socket | null = null; // Garder la référence du socket
+const WS_PORTS = [4000, 4001]; // Liste des ports à écouter (Client A et Client B)
+// Stockage des sockets pour référence future (non critique ici, mais bonne pratique)
+const activeSockets: Socket[] = [];
 
-function connectWs(ip: string) {
-  const port = WS_PORT;
-  const socket: Socket = io(`http://${ip}:${port}`);
-  currentSocket = socket; // Sauvegarde de la référence
+// Une fonction pour initialiser UNE connexion Socket.IO
+function initializeSocket(ip: string, port: number) {
+  const url = `http://${ip}:${port}`;
+  const socket: Socket = io(url);
+  activeSockets.push(socket);
+
+  const connectionName = `Client ${port === 4000 ? 'A (4000)' : 'B (4001)'}`;
 
   socket.on("connect", () => {
-    console.log("Connecté au serveur Socket.IO");
-    setStatus("connected");
+    console.log(`[${connectionName}] Connecté à Socket.IO`);
+    // Afficher l'état de chaque connexion
+    setStatus(`Connecté à A et B`);
   });
 
   socket.on("connect_error", (err: any) => {
-    console.error("Erreur de connexion:", err);
-    setStatus("connect_error");
+    console.error(`[${connectionName}] Erreur de connexion:`, err.message);
+    setStatus(`Erreur de connexion à ${connectionName}`);
+  });
+
+  socket.on("disconnect", (reason: any) => {
+    console.log(`[${connectionName}] Déconnecté: ${reason}`);
+    setStatus(`Déconnecté de ${connectionName}`);
   });
 
   socket.on(CHANNEL, (payload: string) => {
     try {
       const data = JSON.parse(payload);
       if (data.say) {
-        displayMessage(data.say);
+        // Afficher l'origine pour distinguer les messages de A et B
+        displayMessage(`[${connectionName}] ${data.say}`);
 
-        // NOUVEAU: Renvoyer le message reçu comme un écho si ce n'est pas déjà un ECHO
-        if (currentSocket) {
-          // Vérifie si le message commence par "[ECHO" pour éviter les boucles infinies
-          if (!data.say.startsWith('[ECHO')) {
-            currentSocket.emit('echo', data.say);
-            console.log("Envoi de l'écho via Socket.IO :", data.say);
-          }
+        // Renvoyer le message reçu comme un écho si ce n'est pas déjà un ECHO
+        if (!data.say.startsWith('[ECHO')) {
+          // Émet l'écho uniquement sur la même socket qui a reçu le message
+          socket.emit('echo', data.say);
+          console.log(`[${connectionName}] Envoi de l'écho via Socket.IO :`, data.say);
         }
-        // FIN NOUVEAU
 
       } else {
-        displayMessage(`Message non standard reçu: ${payload}`);
+        displayMessage(`[${connectionName}] Message non standard reçu: ${payload}`);
       }
     } catch (e) {
-      displayMessage(payload);
+      displayMessage(`[${connectionName}] Erreur de parsing ou message brut: ${payload}`);
     }
   });
 }
 
+// Fonction principale qui gère toutes les connexions
+function connectWs(ip: string) {
+  // Supprimer les connexions précédentes avant de se reconnecter
+  activeSockets.forEach(s => s.close());
+  activeSockets.length = 0;
+
+  // Lancer une connexion pour chaque port dans la liste
+  for (const port of WS_PORTS) {
+    initializeSocket(ip, port);
+  }
+}
+
+// Le reste des fonctions (displayMessage, setStatus, setup) est inchangé
 function displayMessage(message: string) {
   const div = document.getElementById("messages");
   if (div) div.textContent += message + "\n";
@@ -52,7 +72,7 @@ function displayMessage(message: string) {
 
 function setStatus(text: string) {
   const s = document.getElementById("status");
-  if (s) s.textContent = "status: " + text;
+  if (s) s.textContent = "Status: " + text;
 }
 
 window.addEventListener("load", async () => {
@@ -66,6 +86,9 @@ window.addEventListener("load", async () => {
     return;
   }
 
+  // Remplacer le statut initial
+  setStatus("Prêt à se connecter...");
+
   btn.addEventListener("click", (e) => {
     e.preventDefault();
     const ip = (ipInput.value || "").trim();
@@ -73,8 +96,8 @@ window.addEventListener("load", async () => {
       setStatus("veuillez entrer une IP");
       return;
     }
-    console.log("Tentative de connexion à:", ip);
-    setStatus("connecting...");
+    console.log("Tentative de connexion à A (4000) et B (4001) sur:", ip);
+    setStatus("Connecting...");
     connectWs(ip);
   });
 });
