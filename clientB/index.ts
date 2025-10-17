@@ -47,8 +47,8 @@ app.listen(PORT, () => {
     console.log(`Client B WebSocket listening on port ${WS_PORT}`);
 
     // Enregistrement auprès du service X (Webhook)
-    // CORRECTION: Changement de l'URL vers /api/hook et ajout de 'name'
-    const SERVICE_X_URL = 'http://10.112.132.186:3000/api/hook'; // CORRIGÉ
+    // Utiliser l'URL locale du Service X (ici il tourne sur localhost:3000)
+    const SERVICE_X_URL = 'http://localhost:3000/api/hook';
     axios.post(SERVICE_X_URL, {
         callback: `http://localhost:${PORT}/message`,
         name: "Client B" // AJOUTÉ

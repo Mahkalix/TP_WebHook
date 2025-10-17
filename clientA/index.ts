@@ -6,7 +6,8 @@ import { WebSocket } from 'ws';
 const app = express();
 app.use(express.json());
 
-const PORT = 3000;
+// Change PORT to avoid collision with Service X (which runs on 3000)
+const PORT = 3002;
 const WS_PORT = 4000;
 
 // Stockage des clients WebSocket
@@ -51,7 +52,8 @@ app.listen(PORT, () => {
 
     // Enregistrement auprès du service X (Webhook)
     // CORRECTION: Changement de l'URL vers /api/hook et ajout de 'name'
-    const SERVICE_X_URL = 'http://10.112.132.186:3000/api/hook'; // CORRIGÉ
+    // Utiliser l'URL locale du Service X (ici il tourne sur localhost:3000)
+    const SERVICE_X_URL = 'http://localhost:3000/api/hook';
     axios.post(SERVICE_X_URL, {
         callback: `http://localhost:${PORT}/message`,
         name: "Client A" // AJOUTÉ
