@@ -55,7 +55,7 @@ app.listen(PORT, () => {
     // Utiliser l'URL locale du Service X (ici il tourne sur localhost:3000)
     const SERVICE_X_URL = 'http://10.112.132.186:3000/api/hook';
     axios.post(SERVICE_X_URL, {
-        callback: `http://10.112.132.186:${PORT}/message`,
+        callback: `http://10.112.129.30:${PORT}/message`,
         name: "Client A" // AJOUTÉ
     })
         .then(() => console.log('Enregistré auprès du service X'))
