@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 
 const CHANNEL = "message";
-const WS_PORTS = [4000, 4001]; // Liste des ports à écouter (Client A et Client B)
+const WS_PORTS = [3002, 3001]; // Ports HTTP des clients A et B (Socket.IO est attaché au serveur HTTP)
 // Stockage des sockets pour référence future (non critique ici, mais bonne pratique)
 const activeSockets: Socket[] = [];
 
@@ -11,7 +11,7 @@ function initializeSocket(ip: string, port: number) {
   const socket: Socket = io(url);
   activeSockets.push(socket);
 
-  const connectionName = `Client ${port === 4000 ? 'A (4000)' : 'B (4001)'}`;
+  const connectionName = `Client ${port === 3002 ? 'A (3002)' : 'B (3001)'}`;
 
   socket.on("connect", () => {
     console.log(`[${connectionName}] Connecté à Socket.IO`);
@@ -96,7 +96,7 @@ window.addEventListener("load", async () => {
       setStatus("veuillez entrer une IP");
       return;
     }
-    console.log("Tentative de connexion à A (4000) et B (4001) sur:", ip);
+    console.log("Tentative de connexion à A (3002) et B (3001) sur:", ip);
     setStatus("Connecting...");
     connectWs(ip);
   });

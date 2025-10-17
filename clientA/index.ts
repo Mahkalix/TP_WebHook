@@ -12,7 +12,6 @@ let io: Server | null = null;
 
 // Change PORT to avoid collision with Service X (which runs on 3000)
 const PORT = 3002;
-const WS_PORT = 4000; // Port WebSocket pour Client A
 
 // Endpoint pour recevoir les messages du Webhook
 app.post('/message', (req: Request, res: Response) => {
@@ -39,8 +38,8 @@ const httpServer = app.listen(PORT, () => {
     console.log(`Client A HTTP listening on port ${PORT}`);
 
     try {
-        // Initialisation du serveur Socket.IO
-        const ioServer = new Server(WS_PORT, {
+        // Initialisation du serveur Socket.IO attaché au serveur HTTP
+        const ioServer = new Server(httpServer, {
             cors: {
                 origin: "*", // Nécessaire pour la connexion depuis le front
             }
@@ -49,7 +48,7 @@ const httpServer = app.listen(PORT, () => {
         io = ioServer; // Sauvegarde de l'instance pour l'utiliser dans app.post
 
         ioServer.on('connection', (socket) => {
-            console.log(`Client Socket.IO ${socket.id} connecté sur port ${WS_PORT}`);
+            console.log(`Client Socket.IO ${socket.id} connecté sur port ${PORT}`);
 
             // Écouteur pour l'écho venant du front-end (frontReceiver)
             socket.on('echo', (message: string) => {
@@ -65,11 +64,11 @@ const httpServer = app.listen(PORT, () => {
                 console.log(`Client Socket.IO ${socket.id} déconnecté: ${reason}`);
             });
         });
-        console.log(`Client A Socket.IO listening on port ${WS_PORT}`);
+        console.log(`Client A Socket.IO listening on port ${PORT}`);
 
     } catch (e: any) {
         if (e.code === 'EADDRINUSE') {
-            console.error(`❌ Erreur: Le port Socket.IO ${WS_PORT} est déjà utilisé. Arrêt.`);
+            console.error(`❌ Erreur: Le port Socket.IO ${PORT} est déjà utilisé. Arrêt.`);
         } else {
             console.error('❌ Erreur de démarrage Socket.IO:', e.message);
         }
