@@ -114,6 +114,67 @@
   }
 }
 
+@keyframes rotate3d {
+  0% {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+  }
+  100% {
+    transform: perspective(1000px) rotateY(360deg) rotateX(0deg);
+  }
+}
+
+@keyframes float3d {
+  0%,
+  100% {
+    transform: perspective(1000px) translateZ(0px) translateY(0px) rotateX(0deg);
+  }
+  50% {
+    transform: perspective(1000px) translateZ(50px) translateY(-30px)
+      rotateX(5deg);
+  }
+}
+
+@keyframes depth {
+  0%,
+  100% {
+    transform: perspective(2000px) translateZ(0px);
+  }
+  50% {
+    transform: perspective(2000px) translateZ(100px);
+  }
+}
+
+@keyframes hologram {
+  0%,
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0deg);
+  }
+  50% {
+    opacity: 0.7;
+    transform: perspective(1000px) rotateX(2deg);
+  }
+}
+
+@keyframes orbitRotate {
+  0% {
+    transform: perspective(1500px) rotateY(0deg) translateZ(100px);
+  }
+  100% {
+    transform: perspective(1500px) rotateY(360deg) translateZ(100px);
+  }
+}
+
+@keyframes tiltShift {
+  0%,
+  100% {
+    transform: perspective(1200px) rotateY(-5deg) rotateX(2deg);
+  }
+  50% {
+    transform: perspective(1200px) rotateY(5deg) rotateX(-2deg);
+  }
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -133,6 +194,8 @@ body {
   justify-content: center;
   overflow: hidden;
   position: relative;
+  perspective: 2000px;
+  transform-style: preserve-3d;
 }
 
 body::before {
@@ -177,12 +240,14 @@ body::after {
   height: 400px;
   background: radial-gradient(
     circle,
-    rgba(0, 255, 85, 0.1) 0%,
+    rgba(0, 255, 85, 0.15) 0%,
+    rgba(0, 200, 255, 0.1) 50%,
     transparent 70%
   );
   top: 10%;
   left: 20%;
-  animation: float 8s ease-in-out infinite;
+  animation: float 8s ease-in-out infinite, orbitRotate 25s linear infinite;
+  transform-style: preserve-3d;
 }
 
 .particle-2 {
@@ -190,12 +255,15 @@ body::after {
   height: 300px;
   background: radial-gradient(
     circle,
-    rgba(0, 200, 60, 0.1) 0%,
+    rgba(0, 200, 60, 0.15) 0%,
+    rgba(150, 0, 255, 0.1) 50%,
     transparent 70%
   );
   top: 60%;
   right: 15%;
-  animation: float 10s ease-in-out infinite 2s;
+  animation: float 10s ease-in-out infinite 2s,
+    orbitRotate 30s linear infinite reverse;
+  transform-style: preserve-3d;
 }
 
 .particle-3 {
@@ -203,12 +271,14 @@ body::after {
   height: 350px;
   background: radial-gradient(
     circle,
-    rgba(0, 120, 30, 0.12) 0%,
+    rgba(0, 120, 30, 0.18) 0%,
+    rgba(255, 0, 100, 0.08) 50%,
     transparent 70%
   );
   bottom: 20%;
   left: 10%;
-  animation: float 12s ease-in-out infinite 4s;
+  animation: float 12s ease-in-out infinite 4s, orbitRotate 20s linear infinite;
+  transform-style: preserve-3d;
 }
 
 main {
@@ -217,14 +287,54 @@ main {
   width: 90%;
   max-width: 650px;
   padding: 48px;
-  background: rgba(5, 12, 7, 0.85);
-  backdrop-filter: blur(30px) saturate(150%);
-  -webkit-backdrop-filter: blur(30px) saturate(150%);
-  border-radius: 24px;
-  border: 2px solid rgba(0, 255, 85, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 255, 85, 0.08),
-    inset 0 0 80px rgba(0, 0, 0, 0.6);
-  animation: glow 4s ease-in-out infinite;
+  background: rgba(5, 12, 7, 0.75);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-radius: 32px;
+  border: 3px solid rgba(0, 255, 85, 0.35);
+  box-shadow: 0 25px 80px 0 rgba(0, 255, 85, 0.25),
+    0 50px 150px 0 rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(0, 255, 85, 0.15),
+    inset 0 0 100px rgba(0, 0, 0, 0.7), inset 0 -5px 60px rgba(0, 255, 85, 0.08);
+  animation: glow 4s ease-in-out infinite, float3d 8s ease-in-out infinite,
+    tiltShift 10s ease-in-out infinite;
+  transform-style: preserve-3d;
+  transform: perspective(1200px) rotateY(0deg) rotateX(0deg);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+main::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 255, 85, 0.4),
+    rgba(0, 200, 255, 0.4),
+    rgba(150, 0, 255, 0.4),
+    rgba(255, 0, 100, 0.4)
+  );
+  background-size: 400% 400%;
+  border-radius: 32px;
+  z-index: -1;
+  opacity: 0;
+  filter: blur(20px);
+  animation: gradientShift 8s ease infinite;
+  transition: opacity 0.6s ease;
+}
+
+main:hover::before {
+  opacity: 0.5;
+}
+
+main:hover {
+  transform: perspective(1200px) rotateY(0deg) rotateX(0deg) translateZ(40px)
+    scale(1.02);
+  box-shadow: 0 35px 120px 0 rgba(0, 255, 85, 0.4),
+    0 60px 200px 0 rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(0, 255, 85, 0.25),
+    inset 0 0 120px rgba(0, 0, 0, 0.8), inset 0 -5px 80px rgba(0, 255, 85, 0.12);
 }
 
 .header {
@@ -234,37 +344,83 @@ main {
 }
 
 .header h1 {
-  font-size: 48px;
+  font-size: 52px;
   font-weight: 700;
-  background: linear-gradient(135deg, #00ff55 0%, #00cc44 50%, #00ff55 100%);
-  background-size: 200% 200%;
+  background: linear-gradient(
+    135deg,
+    #00ff55 0%,
+    #00ffcc 25%,
+    #00ccff 50%,
+    #00ff55 75%,
+    #00ff55 100%
+  );
+  background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 16px;
-  letter-spacing: 2px;
-  animation: gradientShift 3s ease infinite, neonPulse 2s ease-in-out infinite;
+  letter-spacing: 4px;
+  animation: gradientShift 4s ease infinite, neonPulse 2s ease-in-out infinite;
   text-transform: uppercase;
   font-family: "JetBrains Mono", monospace;
+  transform-style: preserve-3d;
+  transform: perspective(800px) translateZ(30px);
+  filter: drop-shadow(0 0 30px rgba(0, 255, 85, 0.6))
+    drop-shadow(0 10px 40px rgba(0, 255, 85, 0.4))
+    drop-shadow(0 0 80px rgba(0, 200, 255, 0.3));
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+.header h1::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 85, 0.3) 0%,
+    rgba(0, 200, 255, 0.3) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: blur(20px);
+  transform: translateZ(-20px);
 }
 
 .header h1:hover {
+  transform: perspective(800px) translateZ(50px) scale(1.05);
   animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+  filter: drop-shadow(0 0 50px rgba(0, 255, 85, 0.9))
+    drop-shadow(0 15px 60px rgba(0, 255, 85, 0.6))
+    drop-shadow(0 0 100px rgba(0, 200, 255, 0.5));
 }
 
 /* styles whoami supprimés */
 
 .connection-panel {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 28px;
-  margin-bottom: 24px;
-  border: 1px solid rgba(0, 255, 85, 0.2);
-  box-shadow: inset 0 2px 20px rgba(0, 0, 0, 0.8),
-    0 0 20px rgba(0, 255, 85, 0.1);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 28px;
+  border: 2px solid rgba(0, 255, 85, 0.3);
+  box-shadow: inset 0 3px 30px rgba(0, 0, 0, 0.9),
+    0 10px 40px rgba(0, 255, 85, 0.2), 0 0 60px rgba(0, 200, 255, 0.15);
   position: relative;
   overflow: hidden;
+  transform-style: preserve-3d;
+  transform: perspective(1000px) translateZ(20px);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.connection-panel:hover {
+  transform: perspective(1000px) translateZ(35px) scale(1.01);
+  border-color: rgba(0, 255, 85, 0.6);
+  box-shadow: inset 0 3px 40px rgba(0, 0, 0, 0.95),
+    0 15px 60px rgba(0, 255, 85, 0.35), 0 0 90px rgba(0, 200, 255, 0.25);
 }
 
 .connection-panel::before {
@@ -301,16 +457,19 @@ main {
 
 #ip {
   flex: 1;
-  padding: 16px 20px;
+  padding: 18px 24px;
   font-size: 16px;
   font-family: "JetBrains Mono", monospace;
   background: rgba(0, 0, 0, 0.7);
   border: 2px solid rgba(0, 255, 85, 0.3);
-  border-radius: 12px;
+  border-radius: 14px;
   color: #00ff55;
   outline: none;
-  transition: all 0.3s ease;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: inset 0 3px 15px rgba(0, 0, 0, 0.9),
+    0 5px 20px rgba(0, 255, 85, 0.1);
+  transform-style: preserve-3d;
+  transform: perspective(800px) translateZ(0px);
 }
 
 #ip::placeholder {
@@ -318,29 +477,35 @@ main {
 }
 
 #ip:focus {
-  border: 2px solid rgba(0, 255, 85, 0.8);
-  background: rgba(0, 0, 0, 0.9);
-  box-shadow: 0 0 20px rgba(0, 255, 85, 0.45),
-    inset 0 2px 10px rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(0, 255, 85, 0.9);
+  background: rgba(0, 0, 0, 0.95);
+  box-shadow: 0 0 40px rgba(0, 255, 85, 0.5), 0 10px 50px rgba(0, 200, 255, 0.3),
+    inset 0 3px 20px rgba(0, 0, 0, 0.95);
   color: #e6ffe6;
+  transform: perspective(800px) translateZ(15px) scale(1.01);
 }
 
 #connectBtn {
-  padding: 16px 32px;
+  padding: 18px 40px;
   font-size: 14px;
   font-weight: 700;
   color: #001b0a;
-  background: linear-gradient(135deg, #00ff55 0%, #00cc44 100%);
+  background: linear-gradient(135deg, #00ff55 0%, #00ffcc 50%, #00cc44 100%);
+  background-size: 200% 200%;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0, 255, 85, 0.35), 0 0 40px rgba(0, 255, 85, 0.25);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 8px 30px rgba(0, 255, 85, 0.45), 0 0 60px rgba(0, 255, 85, 0.35),
+    0 15px 40px rgba(0, 200, 255, 0.2), inset 0 -3px 10px rgba(0, 0, 0, 0.2);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   font-family: "JetBrains Mono", monospace;
   position: relative;
   overflow: hidden;
+  transform-style: preserve-3d;
+  transform: perspective(800px) translateZ(10px);
+  animation: gradientShift 5s ease infinite;
 }
 
 #connectBtn::before {
@@ -351,47 +516,112 @@ main {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
   transform: translate(-50%, -50%);
   transition: width 0.6s, height 0.6s;
 }
 
+#connectBtn::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: rotate(45deg);
+  animation: shimmer 3s infinite;
+}
+
 #connectBtn:hover::before {
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
 }
 
 #connectBtn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 30px rgba(0, 255, 85, 0.6), 0 0 60px rgba(0, 255, 85, 0.4);
+  transform: perspective(800px) translateZ(30px) translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 50px rgba(0, 255, 85, 0.7), 0 0 100px rgba(0, 255, 85, 0.5),
+    0 25px 70px rgba(0, 200, 255, 0.4), inset 0 -3px 15px rgba(0, 0, 0, 0.3);
+  filter: brightness(1.2);
 }
 
 #connectBtn:active {
-  transform: scale(0.96);
+  transform: perspective(800px) translateZ(5px) scale(0.97);
 }
 
 .status-panel {
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-  border: 1px solid rgba(0, 255, 85, 0.25);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 24px 32px;
+  margin-bottom: 28px;
+  border: 2px solid rgba(0, 255, 85, 0.35);
   display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8),
-    0 0 15px rgba(0, 255, 85, 0.15);
+  gap: 20px;
+  box-shadow: inset 0 3px 20px rgba(0, 0, 0, 0.9),
+    0 8px 30px rgba(0, 255, 85, 0.25), 0 0 50px rgba(0, 200, 255, 0.15);
+  transform-style: preserve-3d;
+  transform: perspective(1000px) translateZ(15px);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.status-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 85, 0.05) 0%,
+    transparent 50%,
+    rgba(0, 200, 255, 0.05) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.status-panel:hover {
+  transform: perspective(1000px) translateZ(25px) scale(1.01);
+  border-color: rgba(0, 255, 85, 0.6);
+  box-shadow: inset 0 3px 25px rgba(0, 0, 0, 0.95),
+    0 12px 45px rgba(0, 255, 85, 0.4), 0 0 70px rgba(0, 200, 255, 0.25);
+}
+
+.status-panel:hover::before {
+  opacity: 1;
 }
 
 .status-dot {
-  width: 14px;
-  height: 14px;
-  background: #00ff55;
+  width: 18px;
+  height: 18px;
+  background: radial-gradient(circle, #00ff55, #00cc44);
   border-radius: 50%;
   animation: pulse 2s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(0, 255, 85, 0.7);
+  box-shadow: 0 0 30px rgba(0, 255, 85, 0.9), 0 0 60px rgba(0, 255, 85, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.5);
   position: relative;
+  transform-style: preserve-3d;
+  transform: perspective(500px) translateZ(10px);
+}
+
+.status-dot::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  height: 150%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 85, 0.4), transparent 70%);
+  transform: translate(-50%, -50%) translateZ(-5px);
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .status-dot::after {
@@ -418,16 +648,29 @@ main {
 }
 
 .messages-panel {
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid rgba(0, 255, 85, 0.2);
-  box-shadow: inset 0 2px 20px rgba(0, 0, 0, 0.9), 0 4px 20px rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(25px);
+  border-radius: 20px;
+  padding: 32px;
+  border: 2px solid rgba(0, 255, 85, 0.3);
+  box-shadow: inset 0 3px 30px rgba(0, 0, 0, 0.95),
+    0 10px 40px rgba(0, 0, 0, 0.7), 0 0 60px rgba(0, 255, 85, 0.2),
+    0 15px 50px rgba(0, 200, 255, 0.15);
   min-height: 200px;
   max-height: 320px;
   overflow-y: auto;
   position: relative;
+  transform-style: preserve-3d;
+  transform: perspective(1000px) translateZ(10px);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.messages-panel:hover {
+  transform: perspective(1000px) translateZ(25px);
+  border-color: rgba(0, 255, 85, 0.5);
+  box-shadow: inset 0 3px 40px rgba(0, 0, 0, 0.98),
+    0 15px 60px rgba(0, 0, 0, 0.8), 0 0 80px rgba(0, 255, 85, 0.35),
+    0 20px 70px rgba(0, 200, 255, 0.25);
 }
 
 .messages-panel::-webkit-scrollbar {
@@ -459,11 +702,14 @@ main {
 #messages {
   font-family: "JetBrains Mono", "SF Mono", "Monaco", "Consolas", monospace;
   font-size: 14px;
-  line-height: 1.8;
+  line-height: 1.9;
   color: #00ff55;
   white-space: pre-wrap;
   word-break: break-word;
-  text-shadow: 0 0 8px rgba(0, 255, 85, 0.35);
+  text-shadow: 0 0 15px rgba(0, 255, 85, 0.5), 0 0 30px rgba(0, 255, 85, 0.3),
+    0 5px 20px rgba(0, 200, 255, 0.2);
+  transform-style: preserve-3d;
+  animation: hologram 4s ease-in-out infinite;
 }
 
 #message {
@@ -471,15 +717,25 @@ main {
 }
 
 .footer {
-  margin-top: 32px;
+  margin-top: 40px;
   text-align: center;
   font-size: 12px;
-  color: rgba(0, 255, 85, 0.5);
-  letter-spacing: 1px;
+  color: rgba(0, 255, 85, 0.6);
+  letter-spacing: 2px;
   font-family: "JetBrains Mono", monospace;
+  transform-style: preserve-3d;
+  transform: perspective(800px) translateZ(5px);
 }
 
 .footer span {
-  opacity: 0.7;
-  text-shadow: 0 0 10px rgba(0, 255, 85, 0.2);
+  opacity: 0.8;
+  text-shadow: 0 0 15px rgba(0, 255, 85, 0.4), 0 0 30px rgba(0, 200, 255, 0.2);
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.footer span:hover {
+  opacity: 1;
+  transform: perspective(600px) translateZ(10px) scale(1.05);
+  text-shadow: 0 0 25px rgba(0, 255, 85, 0.7), 0 0 50px rgba(0, 200, 255, 0.4);
 }
