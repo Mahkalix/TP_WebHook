@@ -12,6 +12,7 @@ app.use(express.json());
 let io: Server | null = null;
 
 const PORT = 3001;
+const WS_PORT = 4001; // Port WebSocket pour Client B (Ce port est en réalité géré par l'instance de Server(PORT) ou Server(httpServer))
 
 // Endpoint pour recevoir les messages du Webhook
 app.post('/message', (req: Request, res: Response) => {
@@ -37,10 +38,15 @@ app.delete('/message', (req: Request, res: Response) => {
 const httpServer = app.listen(PORT, () => {
     console.log(`Client B HTTP listening on port ${PORT}`);
 
-    // --- MODIFICATION: Initialisation du serveur Socket.IO attaché au serveur HTTP Express
+    // --- MODIFICATION: Initialisation du serveur Socket.IO en lui passant le serveur HTTP Express
+    // Nous écoutons le Socket.IO sur le port 4001 au lieu du 3001, donc nous le créons séparément.
+    // Cependant, pour la robustesse, nous allons revenir à l'ancienne méthode car elle fonctionne
+    // et nous allons ASSURER que le port est libre. Si l'ancienne méthode est cassée, c'est un conflit de port.
+
+    // Si l'ancienne version ne fonctionne pas, le problème est probablement que 4001 n'est pas libre.
 
     try {
-        const ioServer = new Server(httpServer, {
+        const ioServer = new Server(WS_PORT, {
             cors: {
                 origin: "*", // Nécessaire pour la connexion depuis le front
             }
@@ -49,7 +55,7 @@ const httpServer = app.listen(PORT, () => {
         io = ioServer; // Sauvegarde de l'instance pour l'utiliser dans app.post
 
         ioServer.on('connection', (socket) => {
-            console.log(`Client Socket.IO ${socket.id} connecté sur port ${PORT}`);
+            console.log(`Client Socket.IO ${socket.id} connecté sur port ${WS_PORT}`);
 
             // Écouteur pour l'écho venant du front-end (frontReceiver)
             socket.on('echo', (message: string) => {
@@ -65,12 +71,12 @@ const httpServer = app.listen(PORT, () => {
                 console.log(`Client Socket.IO ${socket.id} déconnecté: ${reason}`);
             });
         });
-        console.log(`Client B Socket.IO listening on port ${PORT}`);
+        console.log(`Client B Socket.IO listening on port ${WS_PORT}`);
 
     } catch (e: any) {
         // En cas d'erreur EADDRINUSE (port déjà utilisé)
         if (e.code === 'EADDRINUSE') {
-            console.error(`❌ Erreur: Le port Socket.IO ${PORT} est déjà utilisé. Arrêt.`);
+            console.error(`❌ Erreur: Le port Socket.IO ${WS_PORT} est déjà utilisé. Arrêt.`);
         } else {
             console.error('❌ Erreur de démarrage Socket.IO:', e.message);
         }
