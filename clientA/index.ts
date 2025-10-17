@@ -37,16 +37,7 @@ const httpServer = app.listen(PORT, () => {
     io = ioServer;
 
     ioServer.on("connection", (socket) => {
-      socket.on("echo", (message: string) => {
-        if (!message.startsWith("[ECHO")) {
-          ioServer.emit(
-            "message",
-            JSON.stringify({
-              say: `[ECHO du Client A] Réception confirmée: ${message}`,
-            })
-          );
-        }
-      });
+      socket.on("echo", (message: string) => {});
 
       socket.on("disconnect", (reason) => {});
     });
