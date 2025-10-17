@@ -8,11 +8,10 @@ interface Callback {
 }
 
 export class ChatHook {
-  static INSTANCE = new ChatHook(); // DP singleton
+  static INSTANCE = new ChatHook();
   
   private callbacks: Callback[] = [];
 
-  // S'abonner aux notifications
   post = (req: Request, res: Response) => {
     try {
       console.log('📥 Nouvelle souscription:', req.body);
@@ -23,10 +22,8 @@ export class ChatHook {
         return res.status(400).json({ error: 'URL callback requise' });
       }
 
-      // Nettoyer si déjà existant
       this.clean(url);
 
-      // Ajouter le nouveau callback
       this.callbacks.push({
         url,
         name,
@@ -44,7 +41,6 @@ export class ChatHook {
     }
   }
 
-  // Obtenir la liste des callbacks
   get = (req: Request, res: Response) => {
     try {
       res.status(200).json({
@@ -56,7 +52,6 @@ export class ChatHook {
     }
   }
 
-  // Se désabonner
   delete = (req: Request, res: Response) => {
     try {
       console.log('📤 Désinscription:', req.body);
@@ -82,12 +77,10 @@ export class ChatHook {
     }
   }
 
-  // Nettoyer un callback spécifique
   private clean(url: string) {
     this.callbacks = this.callbacks.filter(x => x.url !== url);
   }
 
-  // Envoyer un message à tous les abonnés
   sendMessage = async (req: Request, res: Response) => {
     try {
       const { message } = req.body;
@@ -116,7 +109,6 @@ export class ChatHook {
     }
   }
 
-  // Émettre un message vers tous les callbacks
   async emit(message: any) {
     const results = [];
 

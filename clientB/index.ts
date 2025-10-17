@@ -53,8 +53,8 @@ const httpServer = app.listen(PORT, () => {
                 console.log(`Client Socket.IO ${socket.id} déconnecté: ${reason}`);
             });
         });
+        
         console.log(`Client B Socket.IO listening on port ${WS_PORT}`);
-
     } catch (e: any) {
         if (e.code === 'EADDRINUSE') {
             console.error(`❌ Erreur: Le port Socket.IO ${WS_PORT} est déjà utilisé. Arrêt.`);

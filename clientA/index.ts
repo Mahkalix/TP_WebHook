@@ -37,24 +37,24 @@ const httpServer = app.listen(PORT, () => {
     io = ioServer;
 
     ioServer.on("connection", (socket) => {
-         console.log(`Client Socket.IO ${socket.id} connecté sur port ${WS_PORT}`);
+      console.log(`Client Socket.IO ${socket.id} connecté sur port ${WS_PORT}`);
+      
       socket.on('echo', (message: string) => {
-                console.log(`💬 Écho reçu du front-end ${socket.id}: ${message}`);
-                if (!message.startsWith('[ECHO')) {
-                    console.log(`📢 Ré-émission de l'écho à tous les abonnés.`);
-                }
-            });
-             socket.on('disconnect', (reason) => {
-                console.log(`Client Socket.IO ${socket.id} déconnecté: ${reason}`);
-            });
-
+        console.log(`💬 Écho reçu du front-end ${socket.id}: ${message}`);
+        if (!message.startsWith('[ECHO')) {
+          console.log(`📢 Ré-émission de l'écho à tous les abonnés.`);
+        }
+      });
+      
+      socket.on('disconnect', (reason: string) => {
+        console.log(`Client Socket.IO ${socket.id} déconnecté: ${reason}`);
+      });
     });
+    
     console.log(`Client A Socket.IO listening on port ${WS_PORT}`);
   } catch (e: any) {
     if (e.code === "EADDRINUSE") {
-      console.error(
-        `❌ Erreur: Le port Socket.IO ${WS_PORT} est déjà utilisé. Arrêt.`
-      );
+      console.error(`❌ Erreur: Le port Socket.IO ${WS_PORT} est déjà utilisé. Arrêt.`);
     } else {
       console.error("❌ Erreur de démarrage Socket.IO:", e.message);
     }
