@@ -1,9 +1,14 @@
 import { io } from "socket.io-client";
 
 const CHANNEL = "message";
+// --- MODIFICATION: Utiliser le port 4000 du Client A (ou 4001 pour Client B)
+const WS_PORT = 4000;
 
 function connectWs(ip: string) {
-  const socket = io(`http://${ip}:3000`);
+  // --- MODIFICATION: Utiliser le port WebSocket correct
+  const socket = io(`http://${ip}:${WS_PORT}`);
+  // ----------------------------------------------------
+
   socket.on("connect", () => {
     console.log("Connecté au serveur WebSocket");
     setStatus("connected");
@@ -12,7 +17,22 @@ function connectWs(ip: string) {
     console.error("Erreur de connexion:", err);
     setStatus("connect_error");
   });
-  socket.on(CHANNEL, (msg: string) => displayMessage(msg));
+
+  // --- MODIFICATION: Parser le message JSON attendu
+  socket.on(CHANNEL, (payload: string) => {
+    try {
+      const data = JSON.parse(payload);
+      if (data.say) {
+        displayMessage(data.say);
+      } else {
+        displayMessage(`Message non standard reçu: ${payload}`);
+      }
+    } catch (e) {
+      // Afficher le message brut si la chaîne n'est pas un JSON valide
+      displayMessage(payload);
+    }
+  });
+  // --------------------------------------------------------
 }
 
 function displayMessage(message: string) {
